@@ -1,0 +1,14 @@
+###
+post http://localhost:3003/posts
+
+###
+get http://localhost:3003/posts/4
+
+###
+POST http://localhost:3003/posts
+Content-Type: application/json
+
+{
+  "title" : "hello",
+  "views" : 100
+}
