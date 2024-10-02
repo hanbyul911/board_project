@@ -12,3 +12,16 @@ Content-Type: application/json
   "title" : "hello",
   "views" : 100
 }
+
+###
+PUT http://localhost:3003/posts/3
+Content-Type: application/json; charset=UTF-8
+
+{
+  "id" : 3,
+  "title" : "title3",
+  "views" : 1000
+}
+
+###
+DELETE http://localhost:3003/posts/4 HTTP/1.1
