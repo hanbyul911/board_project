@@ -1,8 +1,10 @@
 import e from "express";
 import express from "express";
 import mysql from "mysql";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 const connection = mysql.createConnection({
@@ -69,37 +71,38 @@ app.get("/posts/:id", function (req, res) {
     res.send(`${id} : ${title} (${views}명이 조회함)`);
     console.log("The result is: ", results[0]);
   });
-  // res.send(id + ": posts data");
 });
 
-app.get("/qs", function (req, res) {
-  // console.log(req);
-  console.log(req.query);
-  let { id, password } = req.query;
-  res.send(`query string id=${id} password=${password}`);
-});
+// app.get("/qs", function (req, res) {
+//   console.log(req.query);
+//   let { id, password } = req.query;
+//   res.send(`query string id=${id} password=${password}`);
+// });
 
+app.get('/board/list', (req, res) => {
+  let sql = 'select id, boardTitle, boardWriter, boardHits, createdAt from board_table';
+  connection.query(sql, (err, results) => {
+    if (err) throw err;
+    console.log(results);
+    res.json(results);
+  })
+})
 // requesthandler 가 콜백함수로 들어온다.
 // browser로 보내면 무조건 get 요청이라 rest client 나 post 같은 도구를 이용해 확인
-app.post("/posts", (req, res) => {
-  console.log("post 요청이 들어왔습니다.");
+app.post("/board/save", (req, res) => {
+  console.log("게시판 저장 요청이 들어왔습니다.");
   // res.send("/posts --- post method"); // send 하면 끝남!
   console.log(req.body);
-  let { id, title, views } = req.body;
-  let sql = `insert into posts(title, views) values("${title}", ${views})`;
-  // mysql로 data를 저장한다.
-  connection.query(sql, function (error, results) {
+  let { boardTitle, boardWriter, boardPwd, boardContents } = req.body.board;
+  let sql = `insert into board_table(boardTitle, boardWriter, boardPwd, boardContents) values(?,?,?,?)`;
+  // // mysql로 data를 저장한다.
+  connection.query(sql,[boardTitle, boardWriter, boardPwd, boardContents], function (error, results) {
     if (error) res.send("저장에 실패하였습니다.");
-    // let {id, title, views} = results[0];
-    // console.log(id, title, views);
-
-    // for (const result of results) {
-    //   console.log('The result is: ', result.id, result.title, result.views);
-    // }
-    console.log("The result is: ", results[0]);
+    if (results.affectedRows === 1) {
+      console.log(results.insertId + "번째 게시판 글이 등록되었습니다.");
+      res.redirect("/board/list");
+    }
   });
-
-  res.send(id + "post가 저장되었습니다.");
 });
 
 app.put("/posts/:id", (req, res) => {

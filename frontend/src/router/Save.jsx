@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 const Save = () => {
   let [board, setBoard] = useState({
@@ -13,9 +14,11 @@ const Save = () => {
     setBoard({ ...board, [name]: value });
   };
 
-  const boardSave = (e) => {
+  const boardSave = async (e) => {
     e.preventDefault();
-    console.log(board);
+    let res = await axios.post("http://localhost:3003/board/save", { board });
+    console.log(res);
+    setBoard({});
   };
 
   return (
@@ -57,7 +60,7 @@ const Save = () => {
           onChange={inputUpdate}
         ></textarea>
         <br />
-        <input type="submit" value="Save" onClick={boardSave}/>
+        <input type="submit" value="Save" onClick={boardSave} />
       </form>
     </>
   );
